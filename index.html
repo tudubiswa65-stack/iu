@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D leather wallet · premium UI</title>
+    <title>Premium 3D Wallet UI</title>
     <style>
-        /* RESET & GLOBAL */
         * {
             margin: 0;
             padding: 0;
@@ -13,275 +12,331 @@
         }
 
         body {
+            background-color: #000000;
             min-height: 100vh;
-            background-color: #000000;  /* pure black background */
             display: flex;
-            align-items: center;
             justify-content: center;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
         }
 
-        /* 3D perspective container */
-        .scene {
-            perspective: 1200px;
-            perspective-origin: 50% 50%;
+        .wallet-scene {
+            perspective: 1000px;
+            width: 260px;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* MAIN WALLET – variable size, responsive */
-        .wallet {
+        .wallet-wrapper {
             position: relative;
-            width: 240px;                /* fits 200–260px requirement */
+            width: 240px;
             height: 160px;
             transform-style: preserve-3d;
-            transform: rotateX(18deg) rotateY(12deg) rotateZ(4deg);
-            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.35s ease;
-            box-shadow: 0 20px 28px -8px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.7);
-            border-radius: 18px;          /* base rounding, inherited by children */
+            transform: rotateX(15deg) rotateY(-25deg) rotateZ(3deg);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
 
-        /* HOVER – lift & deeper shadow */
-        .wallet:hover {
-            transform: rotateX(16deg) rotateY(10deg) rotateZ(3deg) translateY(-12px);
-            box-shadow: 0 34px 44px -10px rgba(0, 0, 0, 0.95), 0 12px 18px -8px rgba(0, 0, 0, 0.9);
+        .wallet-wrapper:hover {
+            transform: rotateX(15deg) rotateY(-25deg) rotateZ(3deg) translateY(-15px);
         }
 
-        /* all inner layers positioned absolutely */
-        .wallet > * {
+        /* Golden Cards */
+        .cards-container {
             position: absolute;
-            inset: 0;
-            pointer-events: none;        /* let hover pass through, but we keep it on wallet */
-        }
-
-        /* allow pointer events on the whole wallet for hover */
-        .wallet {
-            pointer-events: auto;
-        }
-
-        /* ---------- BASE BACK (leather body + golden stitching) ---------- */
-        .wallet-back {
-            background: #26221f;           /* deep grey leather base */
-            background-image: radial-gradient(circle at 30% 35%, rgba(80, 70, 60, 0.3) 1px, transparent 1px),
-                              radial-gradient(circle at 70% 60%, rgba(100, 85, 70, 0.25) 1px, transparent 1px);
-            background-size: 24px 24px, 30px 30px;
-            border-radius: 18px;
-            border: 2.5px dashed #c9a347;  /* golden stitching effect */
-            box-shadow: inset 0 2px 6px rgba(255, 255, 240, 0.08),   /* soft light reflection */
-                        inset 0 -3px 8px rgba(0, 0, 0, 0.6),
-                        0 0 0 1px rgba(0,0,0,0.35);                 /* fine edge definition */
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 120px;
             z-index: 1;
-        }
-
-        /* ---------- STACKED GOLDEN CARDS (partially visible) ---------- */
-        .cards {
-            position: absolute;
-            top: 12px;                    /* 8% of 160 ≈ 12px */
-            left: 12px;
-            width: 216px;                  /* 90% of 240 */
-            height: 112px;                  /* 70% of 160 – cards area */
-            z-index: 2;
-            /* container for absolutely positioned cards */
-            pointer-events: none;
         }
 
         .card {
             position: absolute;
-            width: 100%;
-            height: 60px;
-            border-radius: 10px 10px 8px 8px;
-            background: linear-gradient(148deg, #bf9530, #f5e79e, #b8860b, #e5c56a);
-            background-size: 200% 150%;
-            box-shadow: 0 8px 12px -6px rgba(0, 0, 0, 0.7),
-                        inset 0 2px 3px rgba(255, 245, 190, 0.5),
-                        inset 0 -2px 4px rgba(0, 0, 0, 0.3);
-            border-left: 1px solid rgba(255, 215, 0, 0.25);
-            border-right: 1px solid rgba(200, 150, 30, 0.4);
-            transform: rotate(0.2deg);      /* subtle natural offset */
-            backdrop-filter: blur(0.5px);   · tiny smoothness */
+            width: 190px;
+            height: 115px;
+            background: linear-gradient(135deg, 
+                #FFD700 0%, 
+                #FFA500 20%, 
+                #FFD700 40%, 
+                #FFA500 60%, 
+                #FFD700 80%, 
+                #FFA500 100%);
+            border-radius: 8px;
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.6),
+                inset 0 -1px 0 rgba(0,0,0,0.2);
+            left: 50%;
+            transform: translateX(-50%);
         }
 
-        /* first card (top) */
-        .card1 {
-            top: 0;
-            z-index: 4;
-            background-position: 10% 20%;
-        }
-
-        /* second card (stacked behind, partially visible) */
-        .card2 {
-            top: 18px;                      /* overlap */
-            z-index: 3;
-            background-position: 70% 40%;
-            filter: brightness(0.98);
-            box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.7),
-                        inset 0 1px 3px rgba(255, 235, 140, 0.6);
-        }
-
-        /* subtle chip hint on top card (tiny gold rectangle) */
-        .card1::after {
+        .card::before {
             content: '';
             position: absolute;
-            top: 12px;
-            left: 18px;
-            width: 22px;
-            height: 16px;
-            background: linear-gradient(135deg, #dbb257, #a67c1e);
-            border-radius: 4px 2px 4px 2px;
-            box-shadow: inset 0 -1px 2px #3a2e0e, 0 1px 2px black;
-            border: 1px solid #ebc258;
-        }
-
-        /* ---------- FRONT POCKET (leather, with strap & button) ---------- */
-        .front-pocket {
-            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
             bottom: 0;
-            left: 12px;                     /* 5% of 240 ≈ 12px */
-            width: 216px;
-            height: 96px;                    /* 60% of 160 */
-            background: #2b2622;              /* warm dark grey leather */
-            background-image: radial-gradient(circle at 25% 40%, #3f3730 1.2px, transparent 1.2px),
-                              radial-gradient(circle at 68% 72%, #3b332b 1px, transparent 1px);
-            background-size: 20px 20px, 28px 28px;
-            border-radius: 0 0 18px 18px;    /* only bottom corners rounded */
-            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.7),
-                        inset 0 -2px 4px rgba(255, 220, 150, 0.1),
-                        0 -2px 4px rgba(0,0,0,0.5);
-            z-index: 5;                       /* above cards & base */
-            /* pocket edge hint: subtle top line */
-            border-top: 1px solid #564b41;
+            background: linear-gradient(135deg, 
+                rgba(255,255,255,0.4) 0%, 
+                rgba(255,255,255,0) 50%, 
+                rgba(0,0,0,0.1) 100%);
+            border-radius: 8px;
             pointer-events: none;
         }
 
-        /* side strap (fixed to right edge of pocket) */
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 40px;
+            background: linear-gradient(135deg, 
+                rgba(255,255,255,0.3) 0%, 
+                rgba(255,255,255,0.1) 100%);
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card:nth-child(1) {
+            top: 0;
+            z-index: 2;
+            box-shadow: 
+                0 6px 12px rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+
+        .card:nth-child(2) {
+            top: 8px;
+            z-index: 1;
+            background: linear-gradient(135deg, 
+                #DAA520 0%, 
+                #B8860B 20%, 
+                #DAA520 40%, 
+                #B8860B 60%, 
+                #DAA520 80%, 
+                #B8860B 100%);
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        /* Wallet Body */
+        .wallet-body {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, 
+                #3a3a3a 0%, 
+                #2a2a2a 30%, 
+                #1f1f1f 70%, 
+                #2a2a2a 100%);
+            border-radius: 12px;
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.8),
+                0 10px 20px rgba(0,0,0,0.6),
+                inset 0 1px 0 rgba(255,255,255,0.1),
+                inset 0 -1px 0 rgba(0,0,0,0.5);
+            z-index: 3;
+            overflow: hidden;
+        }
+
+        /* Leather Texture Overlay */
+        .wallet-body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0,0,0,0.03) 2px,
+                    rgba(0,0,0,0.03) 4px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255,255,255,0.02) 2px,
+                    rgba(255,255,255,0.02) 4px
+                );
+            pointer-events: none;
+            border-radius: 12px;
+        }
+
+        /* Golden Stitching */
+        .stitching {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border: 2px dashed #D4AF37;
+            border-radius: 8px;
+            opacity: 0.8;
+            box-shadow: 0 0 2px rgba(212, 175, 55, 0.5);
+            pointer-events: none;
+        }
+
+        .stitching::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 2px dashed #B8941F;
+            border-radius: 10px;
+            opacity: 0.5;
+        }
+
+        /* Side Strap */
         .strap {
             position: absolute;
-            right: -8px;                      /* protrudes slightly over stitching */
-            top: 26px;
-            width: 14px;
-            height: 44px;
-            background: linear-gradient(90deg, #4d443c, #29231f, #4d443c);
-            border-radius: 6px 4px 8px 4px;
-            box-shadow: -2px 3px 6px rgba(0,0,0,0.6),
-                        inset 0 1px 3px #9f8b78,
-                        inset 0 -2px 3px #1f1b17;
-            transform: skewY(-1deg);
-            z-index: 7;
-            pointer-events: none;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 35px;
+            height: 50px;
+            background: linear-gradient(90deg, 
+                #3a3a3a 0%, 
+                #2a2a2a 50%, 
+                #1f1f1f 100%);
+            border-radius: 0 8px 8px 0;
+            box-shadow: 
+                3px 0 8px rgba(0,0,0,0.6),
+                inset 1px 0 0 rgba(255,255,255,0.1);
+            z-index: 4;
         }
 
-        /* golden metallic button on strap */
+        .strap::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 0;
+            right: 0;
+            bottom: 5px;
+            border-left: 2px dashed #D4AF37;
+            opacity: 0.6;
+        }
+
+        /* Gold Button */
         .button {
             position: absolute;
-            top: -6px;
-            left: 2px;
-            width: 12px;
-            height: 12px;
-            background: radial-gradient(circle at 30% 30%, #fce39c, #b57c1a, #7f5f20);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle at 30% 30%, 
+                #FFD700 0%, 
+                #FFA500 40%, 
+                #B8860B 100%);
             border-radius: 50%;
-            box-shadow: 0 2px 5px #00000099, inset 0 1px 3px #ffe68f, 0 0 0 1px #514128;
-            border: 1px solid transparent;
-            transform: rotate(4deg);
-            z-index: 8;
+            box-shadow: 
+                0 2px 4px rgba(0,0,0,0.6),
+                inset 0 1px 0 rgba(255,255,255,0.8),
+                inset 0 -1px 0 rgba(0,0,0,0.3);
+            z-index: 5;
         }
 
-        /* small extra lighting on strap */
-        .strap::after {
+        .button::before {
             content: '';
             position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 4px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
             height: 10px;
-            background: linear-gradient(to bottom, rgba(255,235,180,0.35), transparent);
-            border-radius: 2px;
-            opacity: 0.8;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255,255,255,0.9) 0%, 
+                rgba(255,255,255,0) 70%);
+            border-radius: 50%;
         }
 
-        /* additional fine shadow to lift the whole wallet */
-        .wallet::after {
+        /* Shadow beneath wallet */
+        .wallet-shadow {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 40px;
+            background: radial-gradient(ellipse at center, 
+                rgba(0,0,0,0.6) 0%, 
+                rgba(0,0,0,0) 70%);
+            filter: blur(10px);
+            transition: all 0.5s ease;
+            z-index: 0;
+        }
+
+        .wallet-wrapper:hover .wallet-shadow {
+            width: 180px;
+            height: 30px;
+            opacity: 0.8;
+            transform: translateX(-50%) translateY(10px);
+        }
+
+        /* Ambient light reflection */
+        .wallet-body::after {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: 18px;
-            box-shadow: inset 0 0 0 1px rgba(190, 145, 70, 0.15);   /* very subtle gold edge */
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 40%,
+                rgba(255,255,255,0.03) 50%,
+                transparent 60%
+            );
             pointer-events: none;
-            z-index: 10;
+            border-radius: 12px;
         }
 
-        /* guarantee that cards remain above base but under front pocket where needed */
-        .cards {
-            z-index: 3;
-        }
-
-        /* tiny details: card shadows on pocket edge */
-        .card1, .card2 {
-            transition: transform 0.2s;
-        }
-
-        /* no hover on cards, wallet hover already does job */
-
-        /* responsiveness: scales down a bit on small screens */
+        /* Responsive */
         @media (max-width: 480px) {
-            .wallet {
-                width: 200px;
-                height: 134px;
+            .wallet-scene {
+                transform: scale(0.8);
             }
-            .cards {
-                top: 10px;
-                left: 10px;
-                width: 180px;
-                height: 94px;
-            }
-            .front-pocket {
-                left: 10px;
-                width: 180px;
-                height: 80px;
-            }
-            .card {
-                height: 50px;
-            }
-            .card2 {
-                top: 15px;
-            }
-            .strap {
-                right: -7px;
-                height: 38px;
-                width: 12px;
-                top: 20px;
-            }
-            .button {
-                width: 10px;
-                height: 10px;
-                top: -5px;
+        }
+
+        @media (max-width: 320px) {
+            .wallet-scene {
+                transform: scale(0.6);
             }
         }
     </style>
 </head>
 <body>
-    <div class="scene">
-        <!-- WALLET component – pure CSS, no images -->
-        <div class="wallet">
-
-            <!-- base leather layer with golden dashed stitching (border) -->
-            <div class="wallet-back"></div>
-
-            <!-- two gold cards stacked, partially protruding -->
-            <div class="cards">
-                <div class="card card1"></div>
-                <div class="card card2"></div>
+    <div class="wallet-scene">
+        <div class="wallet-wrapper">
+            <div class="cards-container">
+                <div class="card"></div>
+                <div class="card"></div>
             </div>
-
-            <!-- front pocket (lower part) with side strap & gold button -->
-            <div class="front-pocket">
+            
+            <div class="wallet-body">
+                <div class="stitching"></div>
                 <div class="strap">
                     <div class="button"></div>
                 </div>
             </div>
-
-            <!-- subtle extra shadows are added via pseudo-elements -->
+            
+            <div class="wallet-shadow"></div>
         </div>
     </div>
-
-    <!-- design note: all materials are synthetic (gradients, shadows) – no image assets -->
-    <!-- leather texture simulated by fine radial gradients, stitching by dashed border -->
 </body>
 </html>
