@@ -3,26 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hyper-Realistic 3D Wallet Icon – Black & Green</title>
+    <title>Hyper-Realistic 3D Wallet – Transparent BG, Size Control</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #111; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { margin: 0; overflow: hidden; background-color: #303030; /* only for preview, actual bg transparent */ }
+        /* Info overlay is optional, kept minimal */
         .info {
             position: absolute;
             bottom: 20px;
             left: 20px;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255,255,255,0.3);
             font-size: 12px;
-            letter-spacing: 1px;
             z-index: 10;
             pointer-events: none;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
     </style>
 </head>
 <body>
-    <div class="info">BLACK & GREEN • HYPER-REALISTIC 3D WALLET</div>
+    <div class="info">BLACK & GREEN • HYPER-REALISTIC 3D WALLET • NO BACKGROUND • SIZE CONTROLLABLE</div>
 
-    <!-- Import Three.js core and add-ons -->
+    <!-- Import Three.js and add-ons -->
     <script type="importmap">
         {
             "imports": {
@@ -37,25 +36,33 @@
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
-        // --- Initialize Scene, Camera, Renderer ---
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x111111); // deep black background
-        
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(5, 3, 8);
-        camera.lookAt(0, 0.5, 0);
+        // =============================================================
+        // SINGLE SIZE PARAMETER - Change this value to scale the icon
+        // =============================================================
+        const iconSize = 1.2;  // <-- ADJUST THIS TO CONTROL OVERALL SIZE (recommended range 0.5 to 2.5)
+        // =============================================================
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        // --- Initialize Scene with Transparent Background ---
+        const scene = new THREE.Scene();
+        scene.background = null; // transparent
+
+        // --- Camera (will be positioned relative to size, but we keep view distance consistent for framing) ---
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(5 * iconSize, 3 * iconSize, 8 * iconSize);
+        camera.lookAt(0, 0.5 * iconSize, 0);
+
+        // --- Renderer with alpha enabled for transparency ---
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.2;
         renderer.outputEncoding = THREE.sRGBEncoding;
-        renderer.shadowMap.enabled = true; // for realism, though we won't cast many shadows in this icon setup
+        renderer.shadowMap.enabled = true; // keep shadows on for realism, but they won't show on transparent bg
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(renderer.domElement);
 
-        // --- Controls to allow user to inspect the hyper-realistic details ---
+        // --- Controls: auto-rotate, zoom, pan disabled, target scaled accordingly ---
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
@@ -63,74 +70,76 @@
         controls.autoRotateSpeed = 1.0;
         controls.enableZoom = true;
         controls.enablePan = false;
-        controls.maxPolarAngle = Math.PI / 2; // restrict below to keep focus
-        controls.target.set(0, 0.5, 0);
+        controls.maxPolarAngle = Math.PI / 2;
+        controls.target.set(0, 0.5 * iconSize, 0);
 
-        // --- Lighting: Complex setup for hyper-realistic reflections and shading ---
+        // --- Lighting (scaled intensity not needed, but positions relative to size) ---
         
-        // 1. Environment map (HDRI) for realistic reflections
+        // Environment map (HDRI) for reflections
         const rgbeLoader = new RGBELoader();
         rgbeLoader.load('https://threejs.org/examples/textures/equirectangular/venice_sunset_1k.hdr', (texture) => {
             texture.mapping = THREE.EquirectangularReflectionMapping;
-            scene.environment = texture; // apply to all standard materials
-            scene.background = new THREE.Color(0x111111); // keep background dark, not the HDRI
+            scene.environment = texture;
+            // scene.background remains null
         });
 
-        // 2. Key light (greenish tint to subtly enhance green elements)
+        // Key light
         const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        keyLight.position.set(2, 5, 3);
+        keyLight.position.set(2 * iconSize, 5 * iconSize, 3 * iconSize);
         keyLight.castShadow = true;
         keyLight.shadow.mapSize.width = 1024;
         keyLight.shadow.mapSize.height = 1024;
-        const d = 5;
+        const d = 5 * iconSize;
         keyLight.shadow.camera.left = -d;
         keyLight.shadow.camera.right = d;
         keyLight.shadow.camera.top = d;
         keyLight.shadow.camera.bottom = -d;
-        keyLight.shadow.camera.near = 2;
-        keyLight.shadow.camera.far = 10;
+        keyLight.shadow.camera.near = 2 * iconSize;
+        keyLight.shadow.camera.far = 10 * iconSize;
         scene.add(keyLight);
 
-        // 3. Fill light (cool white)
+        // Fill light
         const fillLight = new THREE.DirectionalLight(0xccddff, 0.6);
-        fillLight.position.set(-3, 1, 4);
+        fillLight.position.set(-3 * iconSize, 1 * iconSize, 4 * iconSize);
         scene.add(fillLight);
 
-        // 4. Back rim light (green accent)
+        // Back rim light (green accent)
         const rimLight = new THREE.DirectionalLight(0x22ff88, 0.8);
-        rimLight.position.set(-2, 1, -5);
+        rimLight.position.set(-2 * iconSize, 1 * iconSize, -5 * iconSize);
         scene.add(rimLight);
 
-        // 5. Point light with green tint near the wallet to add specular pop on green parts
-        const greenPointLight = new THREE.PointLight(0x33ff99, 0.9, 6);
-        greenPointLight.position.set(1, 1.2, 2);
+        // Green point light
+        const greenPointLight = new THREE.PointLight(0x33ff99, 0.9, 6 * iconSize);
+        greenPointLight.position.set(1 * iconSize, 1.2 * iconSize, 2 * iconSize);
         scene.add(greenPointLight);
 
-        // 6. Ambient fill
-        const ambient = new THREE.AmbientLight(0x404060); // subtle purple/blue complement
+        // Ambient light
+        const ambient = new THREE.AmbientLight(0x404060);
         scene.add(ambient);
 
-        // Optional: small point light from below for edge
+        // Bottom light
         const bottomLight = new THREE.PointLight(0x225533, 0.5);
-        bottomLight.position.set(0, -1, 1);
+        bottomLight.position.set(0, -1 * iconSize, 1 * iconSize);
         scene.add(bottomLight);
 
-        // --- Create the Hyper-Realistic Wallet Icon ---
+        // --- Create the Wallet Group and Apply the Size Scale ---
         const walletGroup = new THREE.Group();
+        
+        // Scale the entire wallet according to iconSize
+        walletGroup.scale.set(iconSize, iconSize, iconSize);
 
-        // ---- Main body: A sleek black leather-like rectangular prism with slight bevel ----
+        // ---- Main body (leather) ----
         const bodyGeo = new THREE.BoxGeometry(2.2, 1.0, 3.2);
         const bodyMat = new THREE.MeshStandardMaterial({
             color: 0x0a0a0a,
             roughness: 0.35,
             metalness: 0.1,
             emissive: 0x000000,
-            emissiveIntensity: 0,
             clearcoat: 0.9,
             clearcoatRoughness: 0.25,
-            bumpMap: createLeatherBumpTexture(), // custom procedural bump
+            bumpMap: createLeatherBumpTexture(),
             bumpScale: 0.02,
-            normalMap: createLeatherNormalTexture(), // for fine grain
+            normalMap: createLeatherNormalTexture(),
             normalScale: new THREE.Vector2(0.8, 0.8)
         });
         const body = new THREE.Mesh(bodyGeo, bodyMat);
@@ -139,7 +148,7 @@
         body.position.y = 0.5;
         walletGroup.add(body);
 
-        // ---- Green accent stripe (modern wallet style) ----
+        // ---- Green accent stripe ----
         const stripeGeo = new THREE.BoxGeometry(0.25, 0.15, 2.8);
         const stripeMat = new THREE.MeshStandardMaterial({
             color: 0x22dd88,
@@ -156,7 +165,7 @@
         stripe.position.set(0.7, 0.5, 0);
         walletGroup.add(stripe);
 
-        // Second smaller stripe on the other side
+        // Second smaller stripe
         const stripe2Geo = new THREE.BoxGeometry(0.2, 0.1, 2.4);
         const stripe2Mat = new THREE.MeshStandardMaterial({
             color: 0x33aa77,
@@ -171,15 +180,13 @@
         stripe2.position.set(-0.8, 0.55, 0.1);
         walletGroup.add(stripe2);
 
-        // ---- Top stitch details (small spheres/cylinders to simulate stitching) ----
+        // ---- Stitch details ----
         const stitchMat = new THREE.MeshStandardMaterial({
             color: 0x888888,
             roughness: 0.4,
             metalness: 0.1,
             emissive: 0x111111
         });
-        
-        // Stitch along the edges (simplified with tiny cylinders)
         const stitchPositions = [
             [-0.9, 0.95, -1.3], [0.9, 0.95, -1.3], [-0.9, 0.95, 1.3], [0.9, 0.95, 1.3],
             [-0.9, 0.95, -0.6], [0.9, 0.95, -0.6], [-0.9, 0.95, 0.6], [0.9, 0.95, 0.6],
@@ -195,7 +202,7 @@
             walletGroup.add(stitch);
         });
 
-        // ---- Metal corners / grommets (greenish metal) ----
+        // ---- Metal corners ----
         const cornerMat = new THREE.MeshStandardMaterial({
             color: 0x224433,
             roughness: 0.2,
@@ -217,7 +224,7 @@
             walletGroup.add(corner);
         });
 
-        // ---- Central band / strap with green glowing accent ----
+        // ---- Central strap ----
         const strapGeo = new THREE.BoxGeometry(0.4, 0.3, 2.0);
         const strapMat = new THREE.MeshStandardMaterial({
             color: 0x111111,
@@ -246,7 +253,7 @@
         strapAccent.position.set(0, 0.8, 0);
         walletGroup.add(strapAccent);
 
-        // Small metal buckle detail
+        // Buckle
         const buckleGeo = new THREE.TorusGeometry(0.2, 0.05, 16, 32, Math.PI);
         const buckleMat = new THREE.MeshStandardMaterial({
             color: 0x33aa77,
@@ -262,7 +269,7 @@
         buckle.receiveShadow = true;
         walletGroup.add(buckle);
 
-        // ---- Additional fine details: subtle card outlines ----
+        // Card outlines
         const cardLineMat = new THREE.MeshStandardMaterial({
             color: 0x224433,
             roughness: 0.3,
@@ -279,7 +286,7 @@
             walletGroup.add(line);
         }
 
-        // Small green logo-like shape
+        // Logo shape
         const logoGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.05, 6);
         const logoMat = new THREE.MeshStandardMaterial({
             color: 0x33ee99,
@@ -298,16 +305,17 @@
 
         scene.add(walletGroup);
 
-        // --- Ground reflection / subtle platform to ground the icon ---
-        const planeGeo = new THREE.CircleGeometry(4, 32);
+        // --- Optional: Very subtle reflective plane (almost invisible, just to catch shadows and ground the icon, but transparent) ---
+        // We make it nearly fully transparent and black to not distract, but it helps with shadow perception.
+        const planeGeo = new THREE.CircleGeometry(4 * iconSize, 32);
         const planeMat = new THREE.MeshStandardMaterial({
             color: 0x000000,
-            roughness: 0.1,
+            roughness: 0.2,
             metalness: 0.0,
             emissive: 0x112211,
-            emissiveIntensity: 0.2,
+            emissiveIntensity: 0.1,
             transparent: true,
-            opacity: 0.3,
+            opacity: 0.15, // very subtle
             side: THREE.DoubleSide
         });
         const plane = new THREE.Mesh(planeGeo, planeMat);
@@ -316,27 +324,27 @@
         plane.receiveShadow = true;
         scene.add(plane);
 
-        // --- Floating particles / dust for atmosphere (optional) ---
-        const particleCount = 60;
+        // --- Floating particles (very faint, for atmosphere) ---
+        const particleCount = 40;
         const particleGeo = new THREE.BufferGeometry();
         const particlePositions = new Float32Array(particleCount * 3);
         for (let i = 0; i < particleCount; i++) {
-            particlePositions[i*3] = (Math.random() - 0.5) * 10;
-            particlePositions[i*3+1] = (Math.random() * 4);
-            particlePositions[i*3+2] = (Math.random() - 0.5) * 10;
+            particlePositions[i*3] = (Math.random() - 0.5) * 10 * iconSize;
+            particlePositions[i*3+1] = (Math.random() * 4 * iconSize);
+            particlePositions[i*3+2] = (Math.random() - 0.5) * 10 * iconSize;
         }
         particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
         const particleMat = new THREE.PointsMaterial({
             color: 0x339966,
-            size: 0.03,
+            size: 0.03 * iconSize,
             transparent: true,
-            opacity: 0.4,
+            opacity: 0.2,
             blending: THREE.AdditiveBlending
         });
         const particles = new THREE.Points(particleGeo, particleMat);
         scene.add(particles);
 
-        // --- Helper functions to generate procedural textures for leather grain (no external images) ---
+        // --- Procedural texture generators (unchanged) ---
         function createLeatherBumpTexture() {
             const canvas = document.createElement('canvas');
             canvas.width = 256;
@@ -344,7 +352,6 @@
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#808080';
             ctx.fillRect(0, 0, 256, 256);
-            // random noise pattern
             for (let i = 0; i < 6000; i++) {
                 const x = Math.random() * 256;
                 const y = Math.random() * 256;
@@ -367,17 +374,14 @@
             canvas.width = 256;
             canvas.height = 256;
             const ctx = canvas.getContext('2d');
-            // base medium blue (neutral normal)
             ctx.fillStyle = '#8080ff';
             ctx.fillRect(0, 0, 256, 256);
-            // small bumps
             for (let i = 0; i < 4000; i++) {
                 const x = Math.random() * 256;
                 const y = Math.random() * 256;
                 const r = Math.random() * 20 + 5;
-                // random color variation for normal map (direction)
-                const rVal = Math.floor(Math.random() * 100 + 78); // red channel
-                const gVal = Math.floor(Math.random() * 100 + 78); // green channel
+                const rVal = Math.floor(Math.random() * 100 + 78);
+                const gVal = Math.floor(Math.random() * 100 + 78);
                 ctx.fillStyle = `rgb(${rVal}, ${gVal}, 255)`;
                 ctx.beginPath();
                 ctx.arc(x, y, r * 0.15, 0, Math.PI * 2);
@@ -390,23 +394,21 @@
             return texture;
         }
 
-        // --- Animate ---
+        // --- Animation with bobbing effect (scaled movement) ---
         function animate() {
             requestAnimationFrame(animate);
 
-            // subtle floating motion for the wallet (icon-like bobbing)
             const time = Date.now() * 0.002;
-            walletGroup.position.y = Math.sin(time) * 0.03;
-            walletGroup.rotation.y = Math.sin(time * 0.5) * 0.05; // micro rotation
+            walletGroup.position.y = Math.sin(time) * (0.03 * iconSize);
+            walletGroup.rotation.y = Math.sin(time * 0.5) * 0.05;
 
-            controls.update(); // auto-rotate enabled
-
+            controls.update();
             renderer.render(scene, camera);
         }
 
         animate();
 
-        // --- Handle resize ---
+        // --- Resize handler ---
         window.addEventListener('resize', onWindowResize, false);
         function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
